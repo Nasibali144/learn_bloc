@@ -17,7 +17,7 @@ void main() async {
 
   /// Sql setting
   final databasePath = await getDatabasesPath();
-  final path = join(databasePath, "TodoApp");
+  final path = join(databasePath, "TodoApp.db");
   await sql.open(path);
 
   runApp(const MyTodoApp());

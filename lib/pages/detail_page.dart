@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:learn_bloc/cubit/detail_cubit/detail_cubit.dart';
 import 'package:learn_bloc/main.dart';
+import 'package:learn_bloc/model/todo_model.dart';
 
 class DetailPage extends StatelessWidget {
-  DetailPage({Key? key}) : super(key: key);
+  final Todo? todo;
+  DetailPage({Key? key, this.todo}) : super(key: key);
 
   final titleCtrl = TextEditingController();
   final descCtrl = TextEditingController();
 
+  void initState() {
+    titleCtrl.text = todo?.title ?? "";
+    descCtrl.text = todo?.description ?? "";
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    initState();
 
     detailCubit.stream.listen((state) {
       /// listen
@@ -17,7 +26,7 @@ class DetailPage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text((detailCubit.state as DetailFailure).message)));
       }
 
-      if(detailCubit.state is DetailCreateSuccess && context.mounted) {
+      if((detailCubit.state is DetailCreateSuccess || detailCubit.state is DetailUpdateSuccess) && context.mounted) {
         Navigator.of(context).pop();
       }
     });
@@ -28,7 +37,11 @@ class DetailPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              detailCubit.create(titleCtrl.text, descCtrl.text);
+              if(todo == null) {
+                detailCubit.create(titleCtrl.text, descCtrl.text);
+              } else {
+                detailCubit.edit(todo!, titleCtrl.text, descCtrl.text);
+              }
             },
             icon: const Icon(Icons.save),
           ),

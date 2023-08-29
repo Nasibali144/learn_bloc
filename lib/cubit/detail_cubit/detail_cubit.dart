@@ -33,4 +33,34 @@ class DetailCubit extends Cubit<DetailState> {
       emit(DetailFailure(message: "DETAIL ERROR:$e"));
     }
   }
+
+  void complete(Todo todo) async {
+    emit(DetailLoading());
+    try {
+      todo.isCompleted = !todo.isCompleted;
+      await sql.update(todo);
+      emit(DetailUpdateSuccess());
+    } catch (e) {
+      debugPrint("Error: $e");
+      emit(DetailFailure(message: "DETAIL ERROR:$e"));
+    }
+  }
+
+
+  void edit(Todo todo, String title, String description) async {
+    if(title.isEmpty || description.isEmpty) {
+      emit(const DetailFailure(message: "Please fill in all the fields"));
+      return;
+    }
+    emit(DetailLoading());
+    try {
+      todo.title = title;
+      todo.description = description;
+      await sql.update(todo);
+      emit(DetailUpdateSuccess());
+    } catch (e) {
+      debugPrint("Error: $e");
+      emit(DetailFailure(message: "DETAIL ERROR:$e"));
+    }
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:learn_bloc/cubit/detail_cubit/detail_cubit.dart';
 import 'package:learn_bloc/cubit/home_cubit/home_cubit.dart';
 import 'package:learn_bloc/main.dart';
+import 'package:learn_bloc/pages/detail_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,6 +20,10 @@ class _HomePageState extends State<HomePage> {
 
     detailCubit.stream.listen((state) {
       if(state is DetailDeleteSuccess || detailCubit.state is DetailCreateSuccess) {
+        homeCubit.fetchTodos();
+      }
+
+      if(state is DetailUpdateSuccess) {
         homeCubit.fetchTodos();
       }
     });
@@ -42,6 +47,15 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (ctx, i) {
                   final item = items[i];
                   return ListTile(
+                    onLongPress: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(todo: item)));
+                    },
+                    leading: Checkbox(
+                      value: item.isCompleted,
+                      onChanged: (bool? value) {
+                        detailCubit.complete(item);
+                      },
+                    ),
                     title: Text(item.title),
                     subtitle: Text(item.description),
                     trailing: IconButton(

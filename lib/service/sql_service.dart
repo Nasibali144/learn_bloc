@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:learn_bloc/model/todo_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -8,19 +10,18 @@ class SQLService {
 
   Future<void> open(String path) async {
     db = await openDatabase(path, version: 1);
-    if(!db.isOpen) {
-      await db.execute('''
-create table TODO ( 
+
+    await db.execute('''
+create table if not exists TODO ( 
   id integer primary key autoincrement, 
   title text not null,
   description text not null,
   isCompleted integer not null)
 ''');
-    }
   }
 
   Future<Todo> insert(Todo todo) async {
-    todo.id = await db.insert(tableTodo, todo.toJson()..remove("id"));
+    todo.id = await db.insert(tableTodo, todo.toJson()..remove("id"), conflictAlgorithm: ConflictAlgorithm.replace);
     return todo;
   }
 
