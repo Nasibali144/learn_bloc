@@ -1,3 +1,4 @@
+import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_bloc/cubit/detail_cubit/detail_cubit.dart';
 import 'package:learn_bloc/cubit/home_cubit/home_cubit.dart';
@@ -7,6 +8,8 @@ import 'package:learn_bloc/service/sql_service.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'cubit/observer.dart';
+
 /// service locator
 final sql = SQLService();
 final homeCubit = HomeCubit();
@@ -14,6 +17,7 @@ final detailCubit = DetailCubit();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = MyBlocObserver();
 
   /// Sql setting
   final databasePath = await getDatabasesPath();

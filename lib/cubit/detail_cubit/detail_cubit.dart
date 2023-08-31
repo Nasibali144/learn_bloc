@@ -13,6 +13,7 @@ class DetailCubit extends Cubit<DetailState> {
       return;
     }
     emit(DetailLoading());
+    await Future.delayed(Duration(seconds: 2));
     try {
       final todo = Todo(id: 1, title: title, description: description, isCompleted: false);
       await sql.insert(todo);
@@ -63,4 +64,16 @@ class DetailCubit extends Cubit<DetailState> {
       emit(DetailFailure(message: "DETAIL ERROR:$e"));
     }
   }
+/// observable method
+/*  @override
+  void onChange(Change<DetailState> change) {
+    super.onChange(change);
+    debugPrint("DetailCubit: $change");
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    super.onError(error, stackTrace);
+    debugPrint("Error: $error, $stackTrace");
+  }*/
 }
