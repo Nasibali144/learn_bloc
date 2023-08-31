@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learn_bloc/cubit/detail_cubit/detail_cubit.dart';
 import 'package:learn_bloc/cubit/home_cubit/home_cubit.dart';
-import 'package:learn_bloc/main.dart';
 import 'package:learn_bloc/pages/detail_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,36 +15,45 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    homeCubit.fetchTodos();
+    context.read<HomeCubit>().fetchTodos();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<DetailCubit, DetailState>(
       listener: (context, state) {
-        if(state is DetailDeleteSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Successfully Deleted!")));
+        if (state is DetailDeleteSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Successfully Deleted!")));
         }
 
         if (state is DetailDeleteSuccess || state is DetailCreateSuccess) {
-          homeCubit.fetchTodos();
+          context.read<HomeCubit>().fetchTodos();
         }
 
         if (state is DetailUpdateSuccess) {
-          homeCubit.fetchTodos();
+          BlocProvider.of<HomeCubit>(context).fetchTodos();
         }
       },
-      bloc: detailCubit,
+      bloc: context.read<DetailCubit>(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text("TODOS"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "/count");
+              },
+              icon: const Icon(Icons.countertops),
+            ),
+          ],
         ),
         body: BlocBuilder<HomeCubit, HomeState>(
-          bloc: homeCubit,
           // buildWhen: (previous, current) {
           //   return true;
           // },
           builder: (context, state) {
+            final cubit = context.read<DetailCubit>();
             final items = state.todos;
 
             return Stack(
@@ -63,14 +71,14 @@ class _HomePageState extends State<HomePage> {
                       leading: Checkbox(
                         value: item.isCompleted,
                         onChanged: (bool? value) {
-                          detailCubit.complete(item);
+                          cubit.complete(item);
                         },
                       ),
                       title: Text(item.title),
                       subtitle: Text(item.description),
                       trailing: IconButton(
                         onPressed: () {
-                          detailCubit.delete(item.id);
+                          cubit.delete(item.id);
                         },
                         icon: const Icon(Icons.delete),
                       ),
